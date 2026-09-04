@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ポリメール</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: sans-serif;
+  background: #eef1f5;
+}
+
+.app {
+  max-width: 500px;
+  margin: auto;
+  background: white;
+  min-height: 100vh;
+}
+
+header {
+  background: #17202a;
+  color: white;
+  padding: 20px;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.menu {
+  display: flex;
+}
+
+.menu button {
+  flex: 1;
+  padding: 15px 5px;
+  border: 0;
+  background: white;
+}
+
+main {
+  padding: 20px;
+}
+
+button {
+  padding: 10px 15px;
+  border: 0;
+  border-radius: 8px;
+  background: #17202a;
+  color: white;
+}
+
+input {
+  padding: 12px;
+  width: 65%;
+  border: 1px solid #aaa;
+  border-radius: 8px;
+}
+
+#messages {
+  height: 250px;
+  overflow-y: auto;
+  background: #f1f3f5;
+  padding: 10px;
+}
+
+#messages p {
+  background: white;
+  padding: 10px;
+  border-radius: 8px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<header>🚓 ポリメール</header>
+
+<div class="menu">
+<button onclick="show('home')">ホーム</button>
+<button onclick="show('chat')">チャット</button>
+<button onclick="show('gps')">位置情報</button>
+</div>
+
+<main id="home">
+<h2>PM-101</h2>
+<p>車両状態：<b id="status">待機中</b></p>
+<button onclick="changeStatus()">状態変更</button>
+</main>
+
+<main id="chat" style="display:none">
+<h2>💬 チャット</h2>
+
+<div id="messages">
+<p>司令室（架空）：ポリメールへようこそ。</p>
+</div>
+
+<br>
+
+<input id="message" placeholder="メッセージ">
+<button onclick="sendMessage()">送信</button>
+</main>
+
+<main id="gps" style="display:none">
+<h2>📍 自分の位置</h2>
+
+<button onclick="getGPS()">現在地を取得</button>
+
+<p id="location">まだ取得していません</p>
+</main>
+
+</div>
+
+<script>
+const statuses = ["待機中","出動中","巡回中","現着"];
+let statusIndex = 0;
+
+function show(page) {
+  document.getElementById("home").style.display = "none";
+  document.getElementById("chat").style.display = "none";
+  document.getElementById("gps").style.display = "none";
+
+  document.getElementById(page).style.display = "block";
+}
+
+function changeStatus() {
+  statusIndex++;
+
+  if (statusIndex >= statuses.length) {
+    statusIndex = 0;
+  }
+
+  document.getElementById("status").textContent =
+    statuses[statusIndex];
+}
+
+function sendMessage() {
+  const input = document.getElementById("message");
+  const text = input.value.trim();
+
+  if (text === "") return;
+
+  const p = document.createElement("p");
+  p.textContent = "PM-101：" + text;
+
+  document.getElementById("messages").appendChild(p);
+
+  input.value = "";
+}
+
+function getGPS() {
+  const output = document.getElementById("location");
+
+  if (!navigator.geolocation) {
+    output.textContent = "GPSに対応していません。";
+    return;
+  }
+
+  output.textContent = "位置情報を取得中…";
+
+  navigator.geolocation.getCurrentPosition(
+    function(position) {
+      output.textContent =
+        "緯度：" + position.coords.latitude.toFixed(6) +
+        "　経度：" + position.coords.longitude.toFixed(6);
+    },
+    function() {
+      output.textContent =
+        "位置情報を取得できませんでした。";
+    }
+  );
+}
+</script>
+
+</body>
+</html>
